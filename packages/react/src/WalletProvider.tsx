@@ -1,17 +1,31 @@
-import { WalletContextProps, AccountsChangedEvent, ConnectEvent } from "index";
 import React, { useEffect, useState } from "react";
 import detectEthereumProivder from "@metamask/detect-provider";
 
-import { WalletContext } from "src/WalletContext";
+import { WalletContext } from "./WalletContext";
+import { AccountsChangedEvent, ConnectEvent, WalletContextProps } from "src";
 
 export const WalletProvider: React.FC = (props) => {
   const [provider, setProvider] = useState<any>();
-  const [address, setAddress] = useState<string>();
+  const [account, setAccount] = useState<string>();
   const [chainId, setChainId] = useState<string>();
+  const [error, setError] = useState<Error>();
 
   const connect = async () => {
-    const provider: any = await detectEthereumProivder();
-    setProvider(provider);
+    const provider: any = await detectEthereumProivder({ timeout: 1000 });
+    if (provider) {
+      setProvider(provider);
+      try {
+        const accounts = await provider.request({
+          method: "eth_requestAccounts",
+        });
+        const account = accounts[0];
+        if (account) {
+          setAccount(account);
+        }
+      } catch (e) {
+        setError(e);
+      }
+    }
   };
 
   useEffect(() => {
@@ -25,7 +39,7 @@ export const WalletProvider: React.FC = (props) => {
         provider.on("accountsChanged", (accounts: AccountsChangedEvent) => {
           const account = [...accounts].pop();
           if (account) {
-            setAddress(account);
+            setAccount(account);
           }
         });
         provider.on("chainChanged", (chainId: string) => {
@@ -36,14 +50,15 @@ export const WalletProvider: React.FC = (props) => {
         provider.on("disconnect", () => {
           setProvider(undefined);
           setChainId(undefined);
-          setAddress(undefined);
+          setAccount(undefined);
         });
       }
     })();
   }, [provider]);
 
   const value: WalletContextProps = {
-    address,
+    account: account,
+    error,
     chainId,
     connect,
     provider,

@@ -1,5 +1,5 @@
-import { WalletContextProps } from "index";
 import { createContext } from "react";
+import { WalletContextProps } from "./";
 
 export const defaultWalletContext: WalletContextProps = {
   connect: async () => {},

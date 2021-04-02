@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "packages/react"
+		},
+		{
+			"path": "packages/react-demo"
+		}
+	],
+	"settings": {}
+}
