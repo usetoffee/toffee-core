@@ -82,7 +82,6 @@ export const checkTokenBySource = async (
   let hasToken = false;
   try {
     const hasErc721 = await checkErc721(account, source, provider);
-    console.log("has", hasErc721);
     hasToken = hasToken || hasErc721;
   } catch (e) {}
   if (hasToken) {
