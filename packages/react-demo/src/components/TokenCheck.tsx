@@ -13,14 +13,19 @@ interface TokenCheckProps {
 export const TokenCheck: React.FC<TokenCheckProps> = ({ source }) => {
   const { provider, account, connect } = useContext(WalletContext);
   const { checking, hasToken, error } = useRequireToken(source);
-  const { request, approved, signing, signed } = useRequireSignature(" test ");
+
+  const message = `
+    Prove you own:
+
+    ${JSON.stringify(source, null, 2)}
+  `;
+
+  const { request, approved, signing, signed } = useRequireSignature(message);
 
   if (!provider || !account) {
     return (
       <div>
-        <a href="#" onClick={connect}>
-          connect
-        </a>
+        <button onClick={connect}>connect</button>
       </div>
     );
   } else if (checking) {
@@ -38,10 +43,7 @@ export const TokenCheck: React.FC<TokenCheckProps> = ({ source }) => {
   } else if (hasToken) {
     return (
       <div>
-        has token, but can he{" "}
-        <a href="#" onClick={request}>
-          sign
-        </a>
+        has token, but can he <button onClick={request}>sign</button>
       </div>
     );
   } else {
