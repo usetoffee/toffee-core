@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import detectEthereumProivder from "@metamask/detect-provider";
 
 import { WalletContext } from "./WalletContext";
-import { AccountsChangedEvent, ConnectEvent, WalletContextProps } from "src";
+import {
+  AccountsChangedEvent,
+  ConnectEvent,
+  WalletContextProps,
+} from "./types";
 
 export const WalletProvider: React.FC = (props) => {
   const [provider, setProvider] = useState<any>();

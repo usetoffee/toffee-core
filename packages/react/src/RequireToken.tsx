@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { RequireTokenProps, TokenSource, WalletContext } from "./";
-import { getErc721Contract } from "./ERC721Contract";
+import { RequireTokenProps, TokenSource } from "./types";
+import { WalletContext } from "./WalletContext";
+import { getErc721Contract } from "./ERC721";
 import { accountMatch } from "./util";
 
 export const useRequireToken = (source: TokenSource | TokenSource[]) => {

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { WalletContext } from "./";
+import { WalletContext } from "./WalletContext";
 import { accountMatch, getSigner } from "./util";
 
 const uuid = () => Math.random().toString(36).slice(-6);
