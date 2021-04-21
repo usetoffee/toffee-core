@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { WalletContextProps } from "./types";
 
 export const defaultWalletContext: WalletContextProps = {
@@ -8,3 +8,8 @@ export const defaultWalletContext: WalletContextProps = {
 export const WalletContext = createContext<WalletContextProps>(
   defaultWalletContext
 );
+
+export const useWalletContext = () => {
+  const walletContext = useContext(WalletContext);
+  return walletContext;
+};

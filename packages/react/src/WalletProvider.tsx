@@ -7,6 +7,7 @@ import {
   ConnectEvent,
   WalletContextProps,
 } from "./types";
+import { useLocalStorage } from "react-use";
 
 export const WalletProvider: React.FC = (props) => {
   const [provider, setProvider] = useState<any>();
@@ -14,10 +15,13 @@ export const WalletProvider: React.FC = (props) => {
   const [chainId, setChainId] = useState<string>();
   const [error, setError] = useState<Error>();
 
+  const [lastAccount, setLastAccount] = useLocalStorage<string>(
+    `@usetoffee/${window.location.host}/lastAccount`,
+    undefined
+  );
+
   const connect = async () => {
-    const provider: any = await detectEthereumProivder({ timeout: 1000 });
     if (provider) {
-      setProvider(provider);
       try {
         const accounts = await provider.request({
           method: "eth_requestAccounts",
@@ -25,6 +29,7 @@ export const WalletProvider: React.FC = (props) => {
         const account = accounts[0];
         if (account) {
           setAccount(account);
+          setLastAccount(account);
         }
       } catch (e) {
         setError(e);
@@ -59,6 +64,21 @@ export const WalletProvider: React.FC = (props) => {
       }
     })();
   }, [provider]);
+
+  useEffect(() => {
+    (async () => {
+      const provider: any = await detectEthereumProivder({
+        timeout: 1000,
+        silent: true,
+      });
+      if (provider) {
+        setProvider(provider);
+        if (lastAccount) {
+          connect();
+        }
+      }
+    })();
+  }, [provider, lastAccount]);
 
   const value: WalletContextProps = {
     account: account,

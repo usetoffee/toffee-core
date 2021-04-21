@@ -3,6 +3,7 @@ import { RequireTokenProps, TokenSource } from "./types";
 import { WalletContext } from "./WalletContext";
 import { getErc721Contract } from "./ERC721";
 import { accountMatch } from "./util";
+import { getErc1155Contract } from "./ERC1155";
 
 export const useRequireToken = (source: TokenSource | TokenSource[]) => {
   const { provider, account, chainId } = useContext(WalletContext);
@@ -85,10 +86,13 @@ export const checkTokenBySource = async (
     const hasErc721 = await checkErc721(account, source, provider);
     hasToken = hasToken || hasErc721;
   } catch (e) {}
+  try {
+    const hasErc1155 = await checkErc1155(account, source, provider);
+    hasToken = hasToken || hasErc1155;
+  } catch (e) {}
   if (hasToken) {
     return hasToken;
   }
-  // HAS ERC1155
   return hasToken;
 };
 
@@ -106,4 +110,20 @@ export const checkErc721 = async (
   );
   const results = await Promise.all(promises);
   return results.some((ownerOf) => accountMatch(ownerOf, account));
+};
+
+export const checkErc1155 = async (
+  account: string,
+  source: TokenSource,
+  provider: any
+) => {
+  let tokenIdArray = Array.isArray(source.tokenId)
+    ? source.tokenId
+    : [source.tokenId];
+  const erc1155 = getErc1155Contract(source.contract, provider);
+  const promises = tokenIdArray.map((tokenId) =>
+    erc1155.functions.balanceOf(account, tokenId)
+  );
+  const results = await Promise.all(promises);
+  return results.some((balance) => balance > 0);
 };

@@ -10,26 +10,30 @@ export const useRequireSignature = (message: string = uuid()) => {
 
   const [approved, setApproved] = useState<boolean>(false);
   const [signing, setSigning] = useState<boolean>(false);
-  const [signed, setSigned] = useState<boolean>(false);
+  const [signature, setSignature] = useState<string>();
 
   useEffect(() => {
-    setSigned(false);
+    setSignature(undefined);
     setApproved(false);
   }, [provider, account, chainId]);
 
   const request = useCallback(async () => {
     setSigning(true);
     const signer = getSigner(provider);
-    const response = await signer.signMessage(message);
-    const verify = ethers.utils.verifyMessage(message, response);
-    if (accountMatch(verify, account)) {
-      setApproved(true);
-    } else {
-      setApproved(false);
-    }
+    try {
+      const response = await signer.signMessage(message);
+      const verify = ethers.utils.verifyMessage(message, response);
+      if (accountMatch(verify, account)) {
+        setApproved(true);
+      } else {
+        setApproved(false);
+      }
+      setSignature(response);
+    } catch (e) {}
     setSigning(false);
-    setSigned(true);
   }, [provider, account, chainId]);
 
-  return { approved, request, signing, signed };
+  const signed = !!signature;
+
+  return { approved, request, signing, signed, signature };
 };

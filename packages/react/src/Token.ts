@@ -24,16 +24,12 @@ export const useTokenMetadata = (
       let _tokenUri;
       try {
         if (!result) {
-          console.log("Checking erc 721");
           result = await erc721Contract?.functions.tokenURI(tokenId);
-          console.log(result);
         }
       } catch (e) {}
       try {
         if (!result) {
-          console.log("Checking erc 1555");
           result = await erc1155Contract?.functions.uri(tokenId);
-          console.log(result);
         }
       } catch (e) {}
       if (Array.isArray(result)) {

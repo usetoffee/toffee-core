@@ -1,4 +1,6 @@
+import { Log } from "@ethersproject/abstract-provider";
 import { Contract, ContractFunction } from "@ethersproject/contracts";
+import { LogDescription } from "ethers/lib/utils";
 import { ReactElement } from "react";
 
 export interface WalletContextProps {
@@ -55,3 +57,9 @@ export interface RequireTokenProps {
   renderUnauthorized: () => ReactElement;
   renderError: (err: Error) => ReactElement;
 }
+
+export type EventCallback<T = object> = (args: {
+  data: T;
+  log: Log;
+  event: LogDescription;
+}) => void;
