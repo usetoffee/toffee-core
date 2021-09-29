@@ -1,12 +1,13 @@
 import { Contract, ContractInterface, ethers } from "ethers";
-import { useContext, useMemo } from "react";
+import { DependencyList, useContext, useMemo } from "react";
 import { ContractExtended } from "./types";
 import { getSigner } from "./util";
 import { WalletContext } from "./WalletContext";
 
 export const useContract = <T extends Contract["functions"]>(
   address: string,
-  abi: ContractInterface
+  abi: ContractInterface,
+  deps: DependencyList = []
 ) => {
   const { provider, chainId, account } = useContext(WalletContext);
   return useMemo(() => {
@@ -21,5 +22,5 @@ export const useContract = <T extends Contract["functions"]>(
     } else {
       return undefined;
     }
-  }, [address, provider, chainId, account]);
+  }, [address, provider, chainId, account, ...deps]);
 };

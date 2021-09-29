@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import detectEthereumProivder from "@metamask/detect-provider";
 
 import { WalletContext } from "./WalletContext";
@@ -9,8 +9,19 @@ import {
 } from "./types";
 import { useLocalStorage } from "react-use";
 
-export const WalletProvider: React.FC = (props) => {
-  const [provider, setProvider] = useState<any>();
+interface WalletProviderProps {
+  fallback?: any;
+}
+
+interface ConnectArgs {
+  provider?: any;
+}
+
+export const WalletProvider: React.FC<WalletProviderProps> = ({
+  fallback,
+  ...props
+}) => {
+  const [provider, setProvider] = useState<any>(fallback);
   const [account, setAccount] = useState<string>();
   const [chainId, setChainId] = useState<string>();
   const [error, setError] = useState<Error>();
@@ -20,65 +31,83 @@ export const WalletProvider: React.FC = (props) => {
     undefined
   );
 
-  const connect = async () => {
-    if (provider) {
-      try {
-        const accounts = await provider.request({
-          method: "eth_requestAccounts",
-        });
-        const account = accounts[0];
-        if (account) {
-          setAccount(account);
-          setLastAccount(account);
+  const connect = useCallback(
+    async (args: ConnectArgs) => {
+      const { provider: newProvider } = args || {};
+      const useProvider = newProvider || provider;
+      if (useProvider) {
+        try {
+          const accounts = await useProvider.request({
+            method: "eth_requestAccounts",
+          });
+          const account = accounts[0];
+          if (account) {
+            setAccount(account);
+            setLastAccount(account);
+          }
+        } catch (e) {
+          const error: any = e;
+          if (error.code === -32002) {
+            setError(new Error("Please check your Ethereum provider."));
+          } else {
+            setError(new Error(error.message));
+          }
         }
-      } catch (e) {
-        setError(e);
+      } else {
+        throw new Error("No provider available");
       }
-    }
-  };
+    },
+    [provider]
+  );
 
   useEffect(() => {
     (async () => {
       if (provider) {
-        provider.on("connect", ({ chainId }: ConnectEvent) => {
-          if (chainId) {
-            setChainId(chainId);
-          }
-        });
-        provider.on("accountsChanged", (accounts: AccountsChangedEvent) => {
-          const account = [...accounts].pop();
-          if (account) {
-            setAccount(account);
-          }
-        });
-        provider.on("chainChanged", (chainId: string) => {
-          if (chainId) {
-            setChainId(chainId);
-          }
-        });
-        provider.on("disconnect", () => {
-          setProvider(undefined);
-          setChainId(undefined);
-          setAccount(undefined);
-        });
+        try {
+          provider.on("connect", ({ chainId }: ConnectEvent) => {
+            if (chainId) {
+              setChainId(chainId);
+            }
+          });
+          provider.on("accountsChanged", (accounts: AccountsChangedEvent) => {
+            const account = [...accounts].pop();
+            if (account) {
+              setAccount(account);
+            }
+          });
+          provider.on("chainChanged", (chainId: string) => {
+            if (chainId) {
+              setChainId(chainId);
+            }
+          });
+          provider.on("disconnect", () => {
+            setProvider(undefined);
+            setChainId(undefined);
+            setAccount(undefined);
+          });
+        } catch (e) {}
       }
     })();
   }, [provider]);
 
   useEffect(() => {
     (async () => {
-      const provider: any = await detectEthereumProivder({
+      const _provider: any = await detectEthereumProivder({
         timeout: 1000,
         silent: true,
       });
-      if (provider) {
-        setProvider(provider);
+      if (_provider) {
+        setProvider(_provider);
         if (lastAccount) {
-          connect();
+          try {
+            await connect({ provider: _provider });
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
     })();
-  }, [provider, lastAccount]);
+  }, [lastAccount]);
 
   const value: WalletContextProps = {
     account: account,

@@ -19,6 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowSyntheticDefaultImports": true,
+    "useUnknownInCatchVariables": true,
     "baseUrl": "./"
   },
   "include": ["src"],

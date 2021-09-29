@@ -8,7 +8,7 @@ export interface WalletContextProps {
   account?: string;
   provider?: any;
   error?: Error;
-  connect: () => Promise<void>;
+  connect: (args?: any) => Promise<void>;
 }
 
 export interface ConnectEvent {
