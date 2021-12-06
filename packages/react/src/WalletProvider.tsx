@@ -35,6 +35,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
     async (args: ConnectArgs) => {
       const { provider: newProvider } = args || {};
       const useProvider = newProvider || provider;
+      setError(undefined);
       if (useProvider) {
         try {
           const accounts = await useProvider.request({
@@ -45,6 +46,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
             setAccount(account);
             setLastAccount(account);
           }
+          setProvider(useProvider);
         } catch (e) {
           const error: any = e;
           if (error.code === -32002) {
@@ -54,11 +56,22 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
           }
         }
       } else {
-        throw new Error("No provider available");
+        const message = "No Ethereum provider available";
+        setError(new Error(message));
       }
     },
     [provider]
   );
+
+  const disconnect = useCallback(async () => {
+    try {
+      await provider.close();
+    } catch (e) {}
+    setProvider(undefined);
+    setAccount(undefined);
+    setChainId(undefined);
+    setError(undefined);
+  }, [provider]);
 
   useEffect(() => {
     (async () => {
@@ -114,6 +127,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
     error,
     chainId,
     connect,
+    disconnect,
     provider,
   };
 

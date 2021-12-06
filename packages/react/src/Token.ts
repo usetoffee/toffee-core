@@ -48,10 +48,16 @@ export const useTokenMetadata = (
   useEffect(() => {
     (async () => {
       if (tokenUri) {
-        const { data: _metadata } = await axios(tokenUri);
-        setMetadata(_metadata);
-        setLoading(false);
+        try {
+          const finalUri = tokenUri?.replace(
+            "ipfs://",
+            "https://gateway.ipfs.io/ipfs/"
+          );
+          const { data: _metadata } = await axios(finalUri);
+          setMetadata(_metadata);
+        } catch (e) {}
       }
+      setLoading(false);
     })();
   }, [tokenUri]);
 

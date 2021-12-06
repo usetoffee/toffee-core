@@ -3,6 +3,7 @@ import { WalletContextProps } from "./types";
 
 export const defaultWalletContext: WalletContextProps = {
   connect: async () => {},
+  disconnect: async () => {},
 };
 
 export const WalletContext = createContext<WalletContextProps>(

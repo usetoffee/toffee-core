@@ -24,7 +24,8 @@ export const useRequireToken = (source: TokenSource | TokenSource[]) => {
           );
           setHasToken(_hasToken);
         } catch (e) {
-          setError(e);
+          const _erorr: any = e;
+          setError(_erorr);
         }
         setChecking(false);
       }

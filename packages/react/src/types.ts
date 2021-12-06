@@ -9,6 +9,7 @@ export interface WalletContextProps {
   provider?: any;
   error?: Error;
   connect: (args?: any) => Promise<void>;
+  disconnect: () => Promise<void>;
 }
 
 export interface ConnectEvent {
@@ -63,3 +64,5 @@ export type EventCallback<T = object> = (args: {
   log: Log;
   event: LogDescription;
 }) => void;
+
+export type AssetType = "image" | "video";
