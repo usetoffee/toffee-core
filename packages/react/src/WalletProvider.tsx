@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import detectEthereumProivder from "@metamask/detect-provider";
-
+import { throttle } from "throttle-debounce";
 import { WalletContext } from "./WalletContext";
 import {
   AccountsChangedEvent,
@@ -36,6 +36,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
       const { provider: newProvider } = args || {};
       const useProvider = newProvider || provider;
       setError(undefined);
+
       if (useProvider) {
         try {
           const accounts = await useProvider.request({
@@ -82,12 +83,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
               setChainId(chainId);
             }
           });
-          provider.on("accountsChanged", (accounts: AccountsChangedEvent) => {
-            const account = [...accounts].pop();
-            if (account) {
-              setAccount(account);
-            }
-          });
+          provider.on(
+            "accountsChanged",
+            throttle(500, true, (accounts: AccountsChangedEvent) => {
+              const account = accounts[0];
+              if (account) {
+                setAccount(account);
+              }
+            })
+          );
           provider.on("chainChanged", (chainId: string) => {
             if (chainId) {
               setChainId(chainId);
@@ -105,10 +109,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
 
   useEffect(() => {
     (async () => {
-      const _provider: any = await detectEthereumProivder({
-        timeout: 1000,
-        silent: true,
-      });
+      let _provider;
+      try {
+        _provider = await detectEthereumProivder({
+          timeout: 1000,
+          silent: true,
+        });
+      } catch (e) {
+        setError(new Error(String(e)));
+      }
       if (_provider) {
         setProvider(_provider);
         if (lastAccount) {
@@ -123,7 +132,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
   }, [lastAccount]);
 
   const value: WalletContextProps = {
-    account: account,
+    account,
     error,
     chainId,
     connect,

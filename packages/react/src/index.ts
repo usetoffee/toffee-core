@@ -20,3 +20,5 @@ export * from "./util";
 export * from "./useTransaction";
 
 export * from "./error";
+
+export * from "./MetadataContext";
