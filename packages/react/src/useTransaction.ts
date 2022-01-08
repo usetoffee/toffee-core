@@ -1,26 +1,31 @@
-import { getDefaultProvider, providers } from "ethers";
+import { providers } from "ethers";
 import { useEffect, useState } from "react";
+import { useWalletContext } from "src";
 
 export const useTransaction = (tx?: string) => {
+  const { provider } = useWalletContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();
   const [receipt, setReceipt] = useState<providers.TransactionReceipt>();
 
   useEffect(() => {
-    if (tx) {
+    if (tx && provider) {
       setLoading(true);
       (async () => {
         try {
-          const provider = getDefaultProvider();
-          const _receipt = await provider.getTransactionReceipt(tx);
+          const _receipt = await provider.sendAsync({
+            method: "eth_getTransactionReceipt",
+            params: [tx],
+          });
           setReceipt(_receipt);
         } catch (e) {
-          setError(e);
+          const err: any = e;
+          setError(err);
         }
         setLoading(false);
       })();
     }
-  }, [tx]);
+  }, [tx, provider]);
 
   return { receipt, loading, error };
 };

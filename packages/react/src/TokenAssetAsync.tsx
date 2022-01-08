@@ -17,6 +17,7 @@ export interface TokenAssetAsyncProps {
   >;
   onLoading?: React.ReactNode;
   fallback?: React.ReactNode;
+  assetType?: AssetType;
 }
 
 export const TokenAssetAsync: React.FC<TokenAssetAsyncProps> = ({
@@ -26,13 +27,14 @@ export const TokenAssetAsync: React.FC<TokenAssetAsyncProps> = ({
   imgProps,
   onLoading,
   fallback,
+  assetType: _assetType,
 }) => {
-  const [assetType, setAssetType] = useState<AssetType>();
+  const [assetType, setAssetType] = useState<AssetType | undefined>(_assetType);
 
   const { metadata, loading } = useTokenMetadata(contract, tokenId);
 
   let src = metadata?.image;
-  if (metadata?.animation_url) {
+  if (metadata?.animation_url && assetType && assetType === "video") {
     src = metadata.animation_url;
   }
   const finalSrc = src?.replace("ipfs://", "https://gateway.ipfs.io/ipfs/");

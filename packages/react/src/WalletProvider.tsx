@@ -8,6 +8,7 @@ import {
   WalletContextProps,
 } from "./types";
 import { useLocalStorage } from "react-use";
+import { ethers } from "ethers";
 
 interface WalletProviderProps {
   fallback?: any;
@@ -44,20 +45,20 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
           });
           const account = accounts[0];
           if (account) {
-            setAccount(account);
+            setAccount(ethers.utils.getAddress(account));
             setLastAccount(account);
           }
           setProvider(useProvider);
         } catch (e) {
           const error: any = e;
           if (error.code === -32002) {
-            setError(new Error("Please check your Ethereum provider."));
+            setError(new Error("Please check Ethereum connection"));
           } else {
             setError(new Error(error.message));
           }
         }
       } else {
-        const message = "No Ethereum provider available";
+        const message = "Please check Ethereum connection";
         setError(new Error(message));
       }
     },
@@ -88,7 +89,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
             throttle(500, true, (accounts: AccountsChangedEvent) => {
               const account = accounts[0];
               if (account) {
-                setAccount(account);
+                setAccount(ethers.utils.getAddress(account));
               }
             })
           );
@@ -112,12 +113,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
       let _provider;
       try {
         _provider = await detectEthereumProivder({
-          timeout: 1000,
-          silent: true,
+          timeout: 5000,
         });
-      } catch (e) {
-        setError(new Error(String(e)));
-      }
+      } catch (e) {}
       if (_provider) {
         setProvider(_provider);
         if (lastAccount) {

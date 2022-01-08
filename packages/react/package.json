@@ -8,15 +8,21 @@
     "start": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usetoffee/toffee-core",
+    "directory": "packages/react"
+  },
   "files": [
     "dist"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "lukeda",
+  "license": "MIT",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
+  "homepage": "https://usetoffee.com/",
   "devDependencies": {
     "@types/node": "^14.14.37",
     "@types/react": ">=16.8.0",
