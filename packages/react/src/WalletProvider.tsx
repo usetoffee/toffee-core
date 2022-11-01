@@ -17,6 +17,7 @@ import { ethers } from "ethers";
 
 interface WalletProviderProps {
   fallback?: any;
+  storage?: string;
 }
 
 interface ConnectArgs {
@@ -25,14 +26,14 @@ interface ConnectArgs {
 
 export const WalletProvider: React.FC<
   PropsWithChildren<WalletProviderProps>
-> = ({ fallback, ...props }) => {
+> = ({ fallback, storage, ...props }) => {
   const [provider, setProvider] = useState<any>(fallback);
   const [account, setAccount] = useState<string>();
   const [chainId, setChainId] = useState<string>();
   const [error, setError] = useState<Error>();
 
   const [lastAccount, setLastAccount] = useLocalStorage<string>(
-    `@usetoffee/${window.location.host}/lastAccount`,
+    `@usetoffee/${window?.location.host || storage}/lastAccount`,
     undefined
   );
 
