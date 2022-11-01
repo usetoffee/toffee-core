@@ -3,6 +3,7 @@ export { ethers } from "ethers";
 export * from "./Contract";
 
 export * from "./ERC721";
+export * from "./ERC1155";
 
 export * from "./RequireToken";
 export * from "./RequireSignature";

@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import detectEthereumProivder from "@metamask/detect-provider";
 import { throttle } from "throttle-debounce";
 import { WalletContext } from "./WalletContext";
@@ -18,10 +23,9 @@ interface ConnectArgs {
   provider?: any;
 }
 
-export const WalletProvider: React.FC<WalletProviderProps> = ({
-  fallback,
-  ...props
-}) => {
+export const WalletProvider: React.FC<
+  PropsWithChildren<WalletProviderProps>
+> = ({ fallback, ...props }) => {
   const [provider, setProvider] = useState<any>(fallback);
   const [account, setAccount] = useState<string>();
   const [chainId, setChainId] = useState<string>();
