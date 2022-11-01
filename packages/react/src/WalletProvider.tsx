@@ -33,7 +33,7 @@ export const WalletProvider: React.FC<
   const [error, setError] = useState<Error>();
 
   const [lastAccount, setLastAccount] = useLocalStorage<string>(
-    `@usetoffee/${window?.location.host || storage}/lastAccount`,
+    `@usetoffee/${storage}/lastAccount`,
     undefined
   );
 
